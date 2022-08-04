@@ -6,7 +6,11 @@ Modified by: Heng-Da Xu <dadamrxx@gmail.com>, Zewen
 Date Modified: March 23, 2019
 """
 import torch
+import os
+import shutil
+import json
 from tqdm import tqdm
+from pathlib import Path
 
 from scitsr.data.loader import TableDataset, TableInferDataset, Data
 from scitsr.model import GraphAttention
@@ -72,7 +76,7 @@ class Trainer:
         print('Training finished.')
         return self.model
 
-    def train_epoch(self, epoch, dataset, should_print=False):
+    def train_epoch(self, epoch, dataset, should_print=True):
         self.model.train()
         loss_list = []
         for index, data in tqdm(enumerate(dataset)):
@@ -150,9 +154,7 @@ def patch_chunks(dataset_folder):
 	:param dataset_folder: train dataset path
 	:return: 1
 	"""
-	import os
-	import shutil
-	from pathlib import Path
+	
 
 	shutil.move(os.path.join(dataset_folder, "chunk"), os.path.join(dataset_folder, "chunk-old"))
 	dir_ = Path(os.path.join(dataset_folder, "chunk-old"))
@@ -171,11 +173,11 @@ def patch_chunks(dataset_folder):
 
 
 if __name__ == '__main__':
-
-    train_path = "/path/to/train_folder"
-    test_path = "/path/to/test_folder/"
-    patch_chunks(train_path)
-    patch_chunks(test_path)
+    sci_tsr_path = "/media/julian/extremepro/SciTSR" # path to train and test data
+    train_path = os.path.join(sci_tsr_path, "train/")
+    test_path = os.path.join(sci_tsr_path, "test/")
+    # patch_chunks(train_path)
+    # patch_chunks(test_path)
     
     train_dataset = TableDataset(
         train_path, with_cells=False, exts=["chunk", "rel"])
@@ -184,7 +186,7 @@ if __name__ == '__main__':
         test_path, with_cells=True, node_norm=node_norm,
         edge_norm=edge_norm, exts=["chunk", "rel"])
     #device = 'cuda:1'
-    device = "cpu"
+    device = "cuda:0"
 
     # Hyper-parameters 
     n_node_features = train_dataset.n_node_features

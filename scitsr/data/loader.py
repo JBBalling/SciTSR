@@ -180,7 +180,7 @@ class TableDataset(Dataset):
 
     def get_sub_paths(self, root_dir: str, sub_names: List[str], trim=None):
         # Check the existence of directories
-        assert os.path.isdir(root_dir)
+        assert os.path.isdir(root_dir), "weird"
         # TODO: sub_dirs redundancy
         sub_dirs = []
         for sub_name in sub_names:
@@ -311,3 +311,38 @@ class TableInferDataset(TableDataset):
         adj = torch.tensor(adj, dtype=torch.long)
         incidence = torch.tensor(incidence, dtype=torch.long)
         return nodes, edges, adj, incidence
+
+    # inference dataset does not have rel objects -> this is what we want to predict
+    def load_dataset(self, dataset_dir, with_cells, trim=None, debug=False, exts=None):
+        dataset, cells = [], []
+        if exts is None: exts = ['chunk']
+        if with_cells:
+            exts.append('json')
+        sub_paths = self.get_sub_paths(dataset_dir, exts, trim=trim)
+        for i, paths in enumerate(sub_paths):
+            if debug and i > 50:
+                break
+            chunk_path = paths[0]
+            #relation_path = paths[1]
+
+            chunks = self.load_chunks(chunk_path)
+            # TODO handle big tables
+            # if len(chunks) > 100 or len(chunks) == 0: continue
+            # relations = self.load_relations(relation_path)
+            # new_chunks, new_rels = self.clean_chunk_rel(chunks, relations)
+            # chunks, relations = new_chunks, new_rels
+            relations = []
+            if with_cells:
+                cell_path = paths[2]
+                with open(cell_path) as f:
+                    cell_json = json.load(f)
+            else:
+                cell_json = None
+
+            dataset.append(Data(
+                chunks=chunks,
+                relations=relations,
+                cells=cell_json,
+                path=chunk_path,
+            ))
+        return dataset

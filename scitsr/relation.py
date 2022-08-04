@@ -27,6 +27,7 @@ class Relation(object):
     self.no_blanks = no_blanks
     self.from_id = from_id
     self.to_id = to_id
+    self.rel_lookup = ["no", "horizontal", "vertical"]
   
   def __eq__(self, rl):
     this_ft = normalize(self.from_text)
@@ -56,4 +57,4 @@ class Relation(object):
       (self.no_blanks == rl.no_blanks if cmp_blank else True)
   
   def __str__(self):
-    return "%d:%d" % (self.direction, self.no_blanks)
+    return "Vertex %s (%s) has %s relation to vertex %s (%s) with %d blanks" % (self.from_id, self.from_text, self.rel_lookup[self.direction], self.to_id, self.to_text, self.no_blanks)

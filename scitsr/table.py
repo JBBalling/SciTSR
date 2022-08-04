@@ -96,8 +96,8 @@ class Table(object):
     # the cell in the table.
     # NOTE x in cell object represents the row id
     self.tid = tid
-    self.row_n = row_n
-    self.col_n = col_n
+    self.row_n = row_n # index of right border of table 
+    self.col_n = col_n # index of bottom border of table
     self.coo2cell_id = [
       [ -1 for _ in range(col_n) ] for _ in range(row_n) ]
     self.cells:List[Chunk] = []
